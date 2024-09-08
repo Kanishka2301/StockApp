@@ -1,17 +1,18 @@
 import React, { useState } from "react";
+import "./FinancialForm.css";
 
 const FinancialForm = () => {
   const [values, setValues] = useState({
-    marketPrice: "",
-    eps: "",
-    bookValue: "",
-    sales: "",
-    annualDividents: "",
-    previousEps: "",
-    currentEps: "",
-    totalDebt: "",
-    totalEquity: "",
-    netIncome: "",
+    marketPrice: "60",
+    eps: "10",
+    bookValue: "30",
+    sales: "15",
+    annualDividends: "4",
+    previousEps: "4",
+    currentEps: "5",
+    totalDebt: "100",
+    totalEquity: "200",
+    netIncome: "35",
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,16 +58,6 @@ const FinancialForm = () => {
           required
         />
       </div>
-      <div>
-        <label>Annual Dividends per share:</label>
-        <input
-          type="number"
-          name="annualDividends"
-          value={values.annualDividents}
-          onChange={handleChange}
-          required
-        />
-      </div>
 
       <div>
         <label>Sales per share:</label>
@@ -77,6 +68,16 @@ const FinancialForm = () => {
           onChange={handleChange}
           required
         />
+        <div>
+          <label>Annual Dividends per share:</label>
+          <input
+            type="number"
+            name="annualDividends"
+            value={values.annualDividends}
+            onChange={handleChange}
+            required
+          />
+        </div>
       </div>
       <div>
         <label>Previous Years EPS:</label>
