@@ -20,6 +20,8 @@ const FinancialForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    console.log(values);
   };
 
   return (
@@ -126,6 +128,8 @@ const FinancialForm = () => {
           required
         />
       </div>
+
+      <button type="submit">Submit</button>
     </form>
   );
 };
