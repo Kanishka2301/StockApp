@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./FinancialForm.css";
 
+const API_KEY = process.env.GEMINI_APP;
+
 const FinancialForm = () => {
   const [values, setValues] = useState({
     marketPrice: "60",
@@ -22,9 +24,44 @@ const FinancialForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(values);
-  };
+    const trainingPrompt = [
+      {
+        parts: [
+          {
+            text: "From next prompt I am going to send you some parameters for predictiong stock market share,tell me is it overvalued or undervalued,buy or not",
+          },
+        ],
+        role: "user",
+      },
+      {
+        role: "model",
+        parts: [
+          {
+            text: "okay",
+          },
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {
+            text: "calculate P/E ratio,P/B ratio,P/S ratio,Dividend Yield,Earnings Growth in %,Debt-to-Equity ratio,RDE % and give as a response",
+          },
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {
+            text: "okay",
+          },
+        ],
+      },
+    ];
 
+    let url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}";
+  };
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <div>
