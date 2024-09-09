@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./FinancialForm.css";
+import { FadeLoader } from "react-spinners";
 
 const API_KEY = process.env.GEMINI_APP;
 
@@ -16,12 +17,14 @@ const FinancialForm = () => {
     totalEquity: "200",
     netIncome: "35",
   });
+  const [isSent, setIsSent] = useState(true);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setValues({ ...values, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const trainingPrompt = [
@@ -57,10 +60,53 @@ const FinancialForm = () => {
           },
         ],
       },
+      {
+        role: "model",
+        parts: [
+          {
+            text: "Aways give response in form of HTML div and table tag",
+          },
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {
+            text: "okay",
+          },
+        ],
+      },
     ];
 
     let url =
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}";
+
+    let messageToSend = [
+      ...trainingPrompt,
+      {
+        role: "user",
+        parts: [
+          {
+            text: JSON.stringify(values),
+          },
+        ],
+      },
+    ];
+    setIsSent(false);
+    let res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: messageToSend,
+      }),
+    });
+    let resjson = await res.json();
+    setIsSent(true);
+    let responseMessage = resjson.candidates[0].content.parts[0].text;
+    console.log(responseMessage);
+    //setResult(responseMessage)
   };
   return (
     <form className="form-container" onSubmit={handleSubmit}>
@@ -166,8 +212,11 @@ const FinancialForm = () => {
           required
         />
       </div>
-
-      <button type="submit">Submit</button>
+      {isSent ? (
+        <button type="submit">Submit</button>
+      ) : (
+        <FadeLoader className="loader" />
+      )}
     </form>
   );
 };
