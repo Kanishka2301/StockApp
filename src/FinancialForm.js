@@ -4,7 +4,7 @@ import { FadeLoader } from "react-spinners";
 
 const API_KEY = process.env.GEMINI_APP;
 
-const FinancialForm = () => {
+const FinancialForm = (setResult) => {
   const [values, setValues] = useState({
     marketPrice: "60",
     eps: "10",
@@ -106,7 +106,7 @@ const FinancialForm = () => {
     setIsSent(true);
     let responseMessage = resjson.candidates[0].content.parts[0].text;
     console.log(responseMessage);
-    //setResult(responseMessage)
+    setResult(responseMessage);
   };
   return (
     <form className="form-container" onSubmit={handleSubmit}>
