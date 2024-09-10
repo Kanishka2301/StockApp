@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import "./FinancialForm.css";
 import { FadeLoader } from "react-spinners";
 
-const API_KEY = process.env.GEMINI_APP;
+const API_KEY = process.env.REACT_APP_GEMINI_APP;
 
-const FinancialForm = (setResult) => {
+const FinancialForm = ({ setResult }) => {
   const [values, setValues] = useState({
     marketPrice: "60",
     eps: "10",
@@ -31,7 +31,7 @@ const FinancialForm = (setResult) => {
       {
         parts: [
           {
-            text: "From next prompt I am going to send you some parameters for predictiong stock market share,tell me is it overvalued or undervalued,buy or not",
+            text: "From next prompt I am going to send you some parameters for predicting stock market share, tell me if it is overvalued or undervalued, buy or not",
           },
         ],
         role: "user",
@@ -48,7 +48,7 @@ const FinancialForm = (setResult) => {
         role: "user",
         parts: [
           {
-            text: "calculate P/E ratio,P/B ratio,P/S ratio,Dividend Yield,Earnings Growth in %,Debt-to-Equity ratio,RDE % and give as a response",
+            text: "calculate P/E ratio, P/B ratio, P/S ratio, Dividend Yield, Earnings Growth in %, Debt-to-Equity ratio, RDE %, and give a response",
           },
         ],
       },
@@ -64,24 +64,15 @@ const FinancialForm = (setResult) => {
         role: "model",
         parts: [
           {
-            text: "Aways give response in form of HTML div and table tag",
-          },
-        ],
-      },
-      {
-        role: "model",
-        parts: [
-          {
-            text: "okay",
+            text: "Always give response in form of HTML div and table tags",
           },
         ],
       },
     ];
 
-    let url =
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
 
-    let messageToSend = [
+    const messageToSend = [
       ...trainingPrompt,
       {
         role: "user",
@@ -92,22 +83,44 @@ const FinancialForm = (setResult) => {
         ],
       },
     ];
+
     setIsSent(false);
-    let res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: messageToSend,
-      }),
-    });
-    let resjson = await res.json();
-    setIsSent(true);
-    let responseMessage = resjson.candidates[0].content.parts[0].text;
-    console.log(responseMessage);
-    setResult(responseMessage);
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: messageToSend,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const resjson = await res.json();
+      console.log("Response JSON:", resjson);
+
+      if (resjson.candidates && resjson.candidates.length > 0) {
+        let responseMessage = resjson.candidates[0].content.parts[0].text;
+        console.log(responseMessage);
+        setResult(responseMessage); // Pass the result to parent App.js
+      } else {
+        console.error("No candidates in response:", resjson);
+        setResult("<p>No data available from the model.</p>");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setResult(
+        "<p>Error fetching stock analysis data. Please try again later.</p>"
+      );
+    } finally {
+      setIsSent(true);
+    }
   };
+
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <div>
@@ -121,7 +134,7 @@ const FinancialForm = (setResult) => {
         />
       </div>
       <div>
-        <label>Earnings per share(EPS):</label>
+        <label>Earnings per share (EPS):</label>
         <input
           type="number"
           name="eps"
@@ -130,7 +143,6 @@ const FinancialForm = (setResult) => {
           required
         />
       </div>
-
       <div>
         <label>Book Value per share:</label>
         <input
@@ -141,7 +153,6 @@ const FinancialForm = (setResult) => {
           required
         />
       </div>
-
       <div>
         <label>Sales per share:</label>
         <input
@@ -151,19 +162,19 @@ const FinancialForm = (setResult) => {
           onChange={handleChange}
           required
         />
-        <div>
-          <label>Annual Dividends per share:</label>
-          <input
-            type="number"
-            name="annualDividends"
-            value={values.annualDividends}
-            onChange={handleChange}
-            required
-          />
-        </div>
       </div>
       <div>
-        <label>Previous Years EPS:</label>
+        <label>Annual Dividends per share:</label>
+        <input
+          type="number"
+          name="annualDividends"
+          value={values.annualDividends}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div>
+        <label>Previous Year’s EPS:</label>
         <input
           type="number"
           name="previousEps"
@@ -173,7 +184,7 @@ const FinancialForm = (setResult) => {
         />
       </div>
       <div>
-        <label>Current Years EPS:</label>
+        <label>Current Year’s EPS:</label>
         <input
           type="number"
           name="currentEps"
